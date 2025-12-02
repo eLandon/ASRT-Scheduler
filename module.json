@@ -9,93 +9,111 @@
    "hasInput":true,
    "hasOutput":true,
    "hideDefaultCommands":false,
-	"defaults":
-	{		
+	"defaults":{		
 	},
+   
    "parameters":{
       "mode":{
          "type":"Enum",
          "description":"off: forced off, on: forced on, auto: follow schedule",
-         "options":{ "off":"off", "on":"on", "auto":"auto" }
+         "options":{ "off":"off", "on":"on", "auto":"auto" },
+         "default": "auto"
+      },
+      "State":{
+         "type": "Boolean",
+         "readOnly": true
       },
       "Add Schedule":{
-            "type":"Trigger"
-         },
-         "Clear all Schedules":{
-            "type":"Trigger"
-         },
+         "type":"Trigger"
+      },
+      "Clear all Schedules":{
+         "type":"Trigger"
+      },
       "Schedule List":{
          "type":"Container",
          "description":"List of weekly schedules, allow to define ON/OFF state times and days during a period of the year. Weekly schedules are combined in one global state (OR combination)",
-         
+      
          "Schedule 1":{
             "type":"Container",
-               "State":{
-                  "type":"Boolean"
+            "State":{
+               "type":"Boolean",
+               "readOnly": true
+            },
+            "Clear":{
+               "type":"Trigger",
+               "description": "Delete current schedule"
+            },
+            "Start date":{
+               "type":"String",
+               "default": "01/01",
+               "description": "first day of the period, DD repeats every month, DD/MM every year, DD/MM/YY doesn't repeat"
+            },
+            "Stop date":{
+               "type":"String",
+               "default": "31/12",
+               "description": "last day of the period"
+            },
+            "Start time":{
+               "type":"String",
+               "default": "09:00",
+               "description": "first day of the period"
+            },
+            "Stop time":{
+               "type":"String",
+               "default": "17:00",
+               "description": "last day of the period"
+            },
+            "days":{
+               "type":"Container",
+               "collapsed":false,
+               "Monday":{
+                  "type":"Boolean",
+                  "default":true
                },
-               "Clear":{
-                  "type":"Trigger",
-                  "description": "Delete current schedule"
+               "Tuesday":{
+                  "type":"Boolean",
+                  "default":true
                },
-               "hours":{
-                  "type":"Container",
-                  "ON":{
-                     "type":"Float",
-                     "ui": "time"
-                  },
+               "Wednesday":{
+                  "type":"Boolean",
+                  "default":true
+               },
+               "Thursday":{
+                  "type":"Boolean",
+                  "default":true
+               },
+               "Friday":{
+                  "type":"Boolean",
+                  "default":true
+               },
+               "Saturday":{
+                  "type":"Boolean",
+                  "default":true
+               },
+               "Sunday":{
+                  "type":"Boolean",
+                  "default":true
                }
-               },
-               "days":{
-                  "type":"Container",
-                  "collapsed":false,
-                  "Monday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Tuesday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Wednesday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Thursday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Friday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Saturday":{
-                     "type":"Boolean",
-                     "default":true
-                  },
-                  "Sunday":{
-                     "type":"Boolean",
-                     "default":true
-                  }
-               }
+            }
          }
-      },
-      "Periods List":{
+      }
+   },
+   "Shedule override":{
+      "type":"Container",
+      "description":"List of period, that allow to ovveride states for specific periods. If an argument is left empty (year, month), the period bceomes reccurent (every year, month",
+      "Period 1":{
          "type":"Container",
-         "description":"List of period, that allow to ovveride states for specific periods. If an argument is left empty (year, month), the period bceomes reccurent (every year, month",
-         "Period 1":{
-            "type":"Container",
-            "State":{"type":"Boolean", "default":false},
-            "Start Year":{"type":"Integer", "default":2024},
-            "Start Month":{"type":"Integer", "default":6, "min":-1, "max":12},
-            "Start day":{"type":"Integer", "default":15, "min":-1, "max":31},
-            "Start Hour":{"type":"Integer", "default":8, "min":-1, "max":23},
-            "Start Minute":{"type":"Integer", "default":0, "min":-1, "max":59},
-            "Stop Year":{"type":"Integer", "default":2024},
-            "Stop Month":{"type":"Integer", "default":8 , "min":-1, "max":12},
-            "Stop day":{"type":"Integer", "default":18, "min":-1, "max":23},
-            "Stop Hour":{"type":"Integer", "default":8, "min":-1, "max":23},
-            "Stop Minute":{"type":"Integer", "default":0, "min":-1, "max":59}
-         }
+         "State":{"type":"Boolean", "default":false},
+         "Start Year":{"type":"Integer", "default":2024},
+         "Start Month":{"type":"Integer", "default":6, "min":-1, "max":12},
+         "Start day":{"type":"Integer", "default":15, "min":-1, "max":31},
+         "Start Hour":{"type":"Integer", "default":8, "min":-1, "max":23},
+         "Start Minute":{"type":"Integer", "default":0, "min":-1, "max":59},
+         "Stop Year":{"type":"Integer", "default":2024},
+         "Stop Month":{"type":"Integer", "default":8 , "min":-1, "max":12},
+         "Stop day":{"type":"Integer", "default":18, "min":-1, "max":23},
+         "Stop Hour":{"type":"Integer", "default":8, "min":-1, "max":23},
+         "Stop Minute":{"type":"Integer", "default":0, "min":-1, "max":59}
       }
    },
 
@@ -111,7 +129,7 @@
    },
 
    "scripts":[
-      "ASRT-TimeScheduler.js"
+      "ASRT-Scheduler.js"
    ],
    "commands":{
       

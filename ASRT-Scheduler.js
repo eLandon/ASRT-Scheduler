@@ -1,7 +1,7 @@
 /* ********** ASRT-Time Scheduler script ********************* */
 
 var mode = local.parameters.mode.get();
-var state = true;
+var state = false;
 var currentTime = {	"year":2022, 
 					"monthName":"January",
 					"month":11,
@@ -13,20 +13,15 @@ var currentTime = {	"year":2022,
 					"seconds":10,
 					"fullDayTime":0,
 				 };
-var start_time = local.parameters.scheduleList.schedule1.hours.on.hour.get() * 60 + local.parameters.scheduleList.schedule1.hours.on.minute.get();
-var stop_time = local.parameters.scheduleList.schedule1.hours.off.hour.get() * 60 + local.parameters.scheduleList.schedule1.hours.off.minute.get();
 
 ///////////////////////////		INIT		/////////////////////////////
 
 function init()
 {
-	//local.templates.addItem("test2");
-	// mode = local.parameters.mode.get();
-	// start_time = local.parameters.scheduleList.schedule1.hours.on.hour.get() * 60 + local.parameters.scheduleList.schedule1.hours.on.minute.get();
-	// stop_time = local.parameters.scheduleList.schedule1.hours.off.hour.get() * 60 + local.parameters.scheduleList.schedule1.hours.off.minute.get();
+
 	updateTime();
 	updateState();
-	state2color();
+	
 }
 
 ///////////////////////////		UPDATE		/////////////////////////////
@@ -59,16 +54,16 @@ function moduleParameterChanged(param)
 			script.log("changed mode : "+ mode);
 			updateState();
 		}
-		else if(param.is(local.parameters.scheduleList.schedule1.hours.on.hour) || param.is(local.parameters.scheduleList.schedule1.hours.on.minute)){
-			start_time = local.parameters.scheduleList.schedule1.hours.on.hour.get() * 60 +
-							local.parameters.scheduleList.schedule1.hours.on.minute.get();
-			script.log("new start time : "+ start_time);
-		}
-		else if(param.is(local.parameters.scheduleList.schedule1.hours.off.hour) || param.is(local.parameters.scheduleList.schedule1.hours.off.minute)){
-			stop_time = local.parameters.scheduleList.schedule1.hours.off.hour.get() * 60 +
-							local.parameters.scheduleList.schedule1.hours.off.minute.get();
-			script.log("new stop time : "+ stop_time);				
-		}
+		// else if(param.is(local.parameters.scheduleList.schedule1.hours.on.hour) || param.is(local.parameters.scheduleList.schedule1.hours.on.minute)){
+		// 	start_time = local.parameters.scheduleList.schedule1.hours.on.hour.get() * 60 +
+		// 					local.parameters.scheduleList.schedule1.hours.on.minute.get();
+		// 	script.log("new start time : "+ start_time);
+		// }
+		// else if(param.is(local.parameters.scheduleList.schedule1.hours.off.hour) || param.is(local.parameters.scheduleList.schedule1.hours.off.minute)){
+		// 	stop_time = local.parameters.scheduleList.schedule1.hours.off.hour.get() * 60 +
+		// 					local.parameters.scheduleList.schedule1.hours.off.minute.get();
+		// 	script.log("new stop time : "+ stop_time);				
+		// }
 
 
 		// script.log("Module parameter changed : "+param.name+" > "+param.get());
@@ -90,8 +85,8 @@ function moduleParameterChanged(param)
 		else if (param.name == "clear"){
 			
 			var parent = param.getParent();
-			script.log("Removing schedule " + parent.niceName);
-			local.parameters.scheduleList.removeContainer("Schedule 3");
+			script.log("Removing schedule " + parent.name);
+			local.parameters.scheduleList.removeContainer(parent.name);
 			script.refreshEnvironment();
 		}
 	}
@@ -108,16 +103,16 @@ function moduleValueChanged(value)
 	// 	script.log(props[i]);
 	// } 
 	
-
-	updateTime();
-	updateState();
+	script.log("Module value changed : "+value.name+" > "+value.get());	
+	
 	if(value.isParameter())
 	{
 		
 
-		if(value.is(local.values.state)){
-			
-			state2color();
+		if(value.is(local.values.seconds)){
+			updateTime();
+			updateState();
+			// script.log("seconds");	
 		}
 		//script.log("Module value changed : "+value.name+" > "+value.get());	
 	}else 
@@ -152,25 +147,35 @@ function updateState(){
 	if(mode=="off"){state = false;}
 	else if(mode=="on"){state = true;}
 	else if(mode=="auto"){
+
+		//Get the list of schedules and parse them
+		var schedulesList = local.getChild("parameters").getChild("Schedule List").getContainers();
+		script.log(schedulesList.length);
+		if(schedulesList.length){
+			for (var i=0; i<schedulesList.length; i++){
+				script.log(schedulesList[i].name);
+			}
+		}
 		
-		if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
-			var currentTimeInt = currentTime.hour * 60 + currentTime.minutes ;
-			if (currentTimeInt>start_time && currentTimeInt<stop_time)
-			{	state = true ;}
-			//revert range, crossing midnight
-			else if (start_time>stop_time && (currentTimeInt>start_time || currentTimeInt<stop_time))
-			{	state = true ;}
-			else {state = false ;}
+		// if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
+		// 	var currentTimeInt = currentTime.hour * 60 + currentTime.minutes ;
+		// 	if (currentTimeInt>start_time && currentTimeInt<stop_time)
+		// 	{	state = true ;}
+		// 	//revert range, crossing midnight
+		// 	else if (start_time>stop_time && (currentTimeInt>start_time || currentTimeInt<stop_time))
+		// 	{	state = true ;}
+		// 	else {state = false ;}
 			
-		}
-		else if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
-		}
+		// }
+		// else if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
+		// }
 		else { state = false ;}
 		
 		
 	}
 	//state = value.get();
 	local.values.state.set(state);
+	state2color();
 	//script.log(state);
 }
 
@@ -186,20 +191,21 @@ function state2color(){
 
 function createSchedule(){
 	script.log("New schedule" );
-	var schedule_list = util.getObjectProperties(local.getChild("parameters").getChild("Schedule List"), true, false);
+	var schedulesList = local.getChild("parameters").getChild("Schedule List").getContainers();
+	script.log(schedulesList.length);
+
+	var newSchedule = local.getChild("parameters").getChild("Schedule List").addContainer("Schedule " + (schedulesList.length+1));
+	var newScheduleState = newSchedule.addBoolParameter("State", "current state of this schedule", false);
+	newScheduleState.setAttribute("readOnly", true);
+	newScheduleState.setAttribute("saveValueOnly",false);
 	
-	script.log(schedule_list.length);
-	var scheduleString = "Schedule " + (schedule_list.length+1);
-	var newSchedule = local.getChild("parameters").getChild("Schedule List").addContainer(scheduleString);
-	newSchedule.addBoolParameter("State", "current state of this schedule", false);
 	newSchedule.addTrigger("Clear", "Delete this schedule").setAttribute("saveValueOnly",false);
-	newHours = newSchedule.addContainer("hours");
-	newON = newHours.addContainer("ON");
-	newOFF = newHours.addContainer("OFF");
-	newON.addIntParameter("hour", "", 12, 0, 23).setAttribute("saveValueOnly",false);
-	newON.addIntParameter("minute", "", 0, 0, 59).setAttribute("saveValueOnly",false);
-	newOFF.addIntParameter("hour", "", 23, 0, 23).setAttribute("saveValueOnly",false);
-	newOFF.addIntParameter("minute", "", 0, 0, 59).setAttribute("saveValueOnly",false);
+
+	newSchedule.addStringParameter("Start date","", "01/01" ).setAttribute("saveValueOnly",false);
+	newSchedule.addStringParameter("Stop date","", "31/12" ).setAttribute("saveValueOnly",false);
+	newSchedule.addStringParameter("Start time","", "9:00" ).setAttribute("saveValueOnly",false);
+	newSchedule.addStringParameter("Stop time","", "17:00" ).setAttribute("saveValueOnly",false);
+
 	newDays = newSchedule.addContainer("days");
 	newDays.addBoolParameter("Monday", "", true).setAttribute("saveValueOnly",false);
 	newDays.addBoolParameter("Tuesday", "", true).setAttribute("saveValueOnly",false);
