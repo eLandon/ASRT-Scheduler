@@ -247,11 +247,11 @@ function updateState(){
 					var month = parseInt(split[1]) ;
 					var year = parseInt(split[2]) ;
 					if(year == 0){year = currentTime.year ;}
-					
+					script.log(day + " " + month + " " + year);
 
-					if(year < currentTime.year ||
+					if( (year < currentTime.year) ||
 						((year == currentTime.year) && (month < currentTime.month)) ||
-						((year == currentTime.year) && (month == currentTime.month) && (day < currentTime.monthDay))
+						((year == currentTime.year) && (month == currentTime.month) && (day <= currentTime.monthDay))
 						){
 							script.log("schedule started ok");
 							//startDate is passed, let's test enDate
@@ -260,12 +260,13 @@ function updateState(){
 							day = parseInt(split[0]) ;
 							month = parseInt(split[1]) ;
 							year = parseInt(split[2]) ;
-							if(year == 0){year = currentTime.year ;}
+							if((year == 0) && (month >= currentTime.month)){year = currentTime.year ;}
+							else if((year == 0) && (month < currentTime.month)){year = currentTime.year + 1 ;}
+							script.log(day + " " + month + " " + year);
 
-
-							if(year > currentTime.year ||
+							if( (year > currentTime.year) ||
 								((year == currentTime.year) && (month > currentTime.month)) ||
-								(year == currentTime.year) && (month == currentTime.month) && (day >= currentTime.monthDay) ){
+								((year == currentTime.year) && (month == currentTime.month) && (day >= currentTime.monthDay)) ){
 									script.log("schedule active");
 
 
