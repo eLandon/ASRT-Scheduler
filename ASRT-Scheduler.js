@@ -92,10 +92,8 @@ function moduleParameterChanged(param)
 	}
 }
 
-/*
- This function will be called each time a value of this module has changed, meaning a parameter or trigger inside the "Values" panel of this module
- This function only exists because the script is in a module
-*/
+
+
 function moduleValueChanged(value)
 {
 	// var props = util.getObjectMethods(local.templates);
@@ -121,73 +119,7 @@ function moduleValueChanged(value)
 	}
 }
 
-///////////////////////////		HELPERS		/////////////////////////////
-
-function updateTime(){
-	currentTime.year = local.values.year.get();
-	currentTime.monthName = local.values.monthName.get();
-	currentTime.month = local.values.month.get();
-	currentTime.monthDay = local.values.monthDay.get();
-	currentTime.weekDayName = local.values.weekDayName.get();
-	currentTime.weekDay = local.values.weekDay.get();
-	currentTime.hour = local.values.hour.get();
-	currentTime.minutes = local.values.minutes.get();
-	currentTime.seconds = local.values.seconds.get();
-	currentTime.fullDayTime = local.values.fullDayTime.get();
-
-	//script.log(currentTime.seconds);
-}
-
-function updateState(){
-	// var props = util.getObjectMethods(local.values.weekDayName);
-	// for (var i=0; i<props.length ; i++){
-	// 	script.log(props[i]);
-	// } 
-
-	if(mode=="off"){state = false;}
-	else if(mode=="on"){state = true;}
-	else if(mode=="auto"){
-
-		//Get the list of schedules and parse them
-		var schedulesList = local.getChild("parameters").getChild("Schedule List").getContainers();
-		script.log(schedulesList.length);
-		if(schedulesList.length){
-			for (var i=0; i<schedulesList.length; i++){
-				script.log(schedulesList[i].name);
-			}
-		}
-		
-		// if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
-		// 	var currentTimeInt = currentTime.hour * 60 + currentTime.minutes ;
-		// 	if (currentTimeInt>start_time && currentTimeInt<stop_time)
-		// 	{	state = true ;}
-		// 	//revert range, crossing midnight
-		// 	else if (start_time>stop_time && (currentTimeInt>start_time || currentTimeInt<stop_time))
-		// 	{	state = true ;}
-		// 	else {state = false ;}
-			
-		// }
-		// else if(local.parameters.days[local.values.weekDayName.getKey().toLowerCase()].get()){
-		// }
-		else { state = false ;}
-		
-		
-	}
-	//state = value.get();
-	local.values.state.set(state);
-	state2color();
-	//script.log(state);
-}
-
-function state2color(){
-	if (state == 0){
-		local.values.stateColor.set([1,0,0,1]);
-	}
-	else{
-		local.values.stateColor.set([0,1,0,1]);
-	}
-}
-
+///////////////////////////		DYNAMIC UI PARAMETERS		/////////////////////////////
 
 function createSchedule(){
 	script.log("New schedule" );
@@ -257,4 +189,129 @@ function clearAllPeriods(){
 	// periodsList.addTrigger("Clear all Priods", "");
 	script.refreshEnvironment();
 }
+
+
+///////////////////////////		TIME AND STATE		/////////////////////////////
+
+function updateTime(){
+	currentTime.year = local.values.year.get();
+	currentTime.monthName = local.values.monthName.get();
+	currentTime.month = local.values.month.get();
+	currentTime.monthDay = local.values.monthDay.get();
+	currentTime.weekDayName = local.values.weekDayName.getOptionAt(local.values.weekDayName.getIndex()).key;
+	currentTime.weekDay = local.values.weekDay.get();
+	currentTime.hour = local.values.hour.get();
+	currentTime.minutes = local.values.minutes.get();
+	currentTime.seconds = local.values.seconds.get();
+	currentTime.fullDayTime = local.values.fullDayTime.get();
+
+	//script.log(currentTime.seconds);
+}
+
+function parseStringDate(stringDate, day, month, year){
+	var split = stringDate.split("/"); //{day, month, year}
+	day = parseInt(split[0]) ;
+	month = parseInt(split[1]) ;
+	year = parseInt(split[2]) ;
+	if(year == 0){year = currentTime.year ;}
+	// script.log(day + "  " + month + " " + year);
+	
+	
+}
+
+function updateState(){
+	// var props = util.getObjectMethods(local.values.weekDayName);
+	// for (var i=0; i<props.length ; i++){
+	// 	script.log(props[i]);
+	// } 
+	state = false ;
+	if(mode=="off"){state = false;}
+	else if(mode=="on"){state = true;}
+	else if(mode=="auto"){
+
+		//Get the list of schedules and parse them
+		var schedulesList = local.getChild("parameters").getChild("Schedule List").getContainers();
+		script.log(schedulesList.length);
+		if(schedulesList.length){
+			for (var i=0; i<schedulesList.length; i++){
+				var scheduleState = false ;
+				script.log(schedulesList[i].name);
+				//first check if the schedule is active today, else pass
+				script.log(currentTime.weekDayName);				
+				if(schedulesList[i].getChild("days").getChild(currentTime.weekDayName).get()){
+
+					// check if we are in date range
+					var startDate = schedulesList[i].startDate.get();
+					var split = startDate.split("/"); //{day, month, year}
+					var day = parseInt(split[0]) ;
+					var month = parseInt(split[1]) ;
+					var year = parseInt(split[2]) ;
+					if(year == 0){year = currentTime.year ;}
+					
+
+					if(year < currentTime.year ||
+						((year == currentTime.year) && (month < currentTime.month)) ||
+						((year == currentTime.year) && (month == currentTime.month) && (day < currentTime.monthDay))
+						){
+							script.log("schedule started ok");
+							//startDate is passed, let's test enDate
+							startDate = schedulesList[i].stopDate.get();
+							split = startDate.split("/"); //{day, month, year}
+							day = parseInt(split[0]) ;
+							month = parseInt(split[1]) ;
+							year = parseInt(split[2]) ;
+							if(year == 0){year = currentTime.year ;}
+
+
+							if(year > currentTime.year ||
+								((year == currentTime.year) && (month > currentTime.month)) ||
+								(year == currentTime.year) && (month == currentTime.month) && (day >= currentTime.monthDay) ){
+									script.log("schedule active");
+
+
+									var time = schedulesList[i].startTime.get();
+									split = time.split(":"); //{hour,minutes}
+									time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
+
+									if(time <= currentTime.fullDayTime){
+										script.log("started");
+										time = schedulesList[i].stopTime.get();
+										split = time.split(":"); //{hour,minutes}
+										time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
+										if(time >= currentTime.fullDayTime){
+											script.log(" and running");
+											scheduleState = true ;
+											state = true ;
+										}
+
+									}
+									
+
+									
+									
+
+							}
+					}
+				}
+				schedulesList[i].state.set(scheduleState);
+			}
+		}
+	}
+
+	//state = value.get();
+	local.getChild("values").getChild("state").set(state);
+	state2color();
+	//script.log(state);
+}
+
+function state2color(){
+	if (state == 0){
+		local.values.stateColor.set([1,0,0,1]);
+	}
+	else{
+		local.values.stateColor.set([0,1,0,1]);
+	}
+}
+
+
 

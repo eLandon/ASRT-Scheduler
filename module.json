@@ -19,10 +19,6 @@
          "options":{ "off":"off", "on":"on", "auto":"auto" },
          "default": "auto"
       },
-      "State":{
-         "type": "Boolean",
-         "readOnly": true
-      },
       "Add Schedule":{
          "type":"Trigger"
       },
@@ -51,17 +47,17 @@
             "Stop date":{
                "type":"String",
                "default": "31/12",
-               "description": "last day of the period"
+               "description": "last day of the period,DD repeats every month, DD/MM every year, DD/MM/YY doesn't repeat"
             },
             "Start time":{
                "type":"String",
                "default": "09:00",
-               "description": "first day of the period"
+               "description": ""
             },
             "Stop time":{
                "type":"String",
                "default": "17:00",
-               "description": "last day of the period"
+               "description": ""
             },
             "days":{
                "type":"Container",
