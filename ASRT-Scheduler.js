@@ -54,17 +54,6 @@ function moduleParameterChanged(param)
 			script.log("changed mode : "+ mode);
 			updateState();
 		}
-		// else if(param.is(local.parameters.scheduleList.schedule1.hours.on.hour) || param.is(local.parameters.scheduleList.schedule1.hours.on.minute)){
-		// 	start_time = local.parameters.scheduleList.schedule1.hours.on.hour.get() * 60 +
-		// 					local.parameters.scheduleList.schedule1.hours.on.minute.get();
-		// 	script.log("new start time : "+ start_time);
-		// }
-		// else if(param.is(local.parameters.scheduleList.schedule1.hours.off.hour) || param.is(local.parameters.scheduleList.schedule1.hours.off.minute)){
-		// 	stop_time = local.parameters.scheduleList.schedule1.hours.off.hour.get() * 60 +
-		// 					local.parameters.scheduleList.schedule1.hours.off.minute.get();
-		// 	script.log("new stop time : "+ stop_time);				
-		// }
-
 
 		// script.log("Module parameter changed : "+param.name+" > "+param.get());
 	}else 
@@ -101,7 +90,7 @@ function moduleValueChanged(value)
 	// 	script.log(props[i]);
 	// } 
 	
-	script.log("Module value changed : "+value.name+" > "+value.get());	
+	// script.log("Module value changed : "+value.name+" > "+value.get());	
 	
 	if(value.isParameter())
 	{
@@ -148,27 +137,27 @@ function createSchedule(){
 	newDays.addBoolParameter("Sunday", "", true).setAttribute("saveValueOnly",false);
 }
 
-function createPeriod(){
-	script.log("New period" );
-	var period_list = util.getObjectProperties(local.getChild("parameters").getChild("Periods List"), true, false);
+// function createPeriod(){
+// 	script.log("New period" );
+// 	var period_list = util.getObjectProperties(local.getChild("parameters").getChild("Periods List"), true, false);
 	
-	script.log(period_list.length);
-	var periodString = "Period " + (period_list.length+1);
-	var newPeriod = local.getChild("parameters").getChild("Periods List").addContainer(periodString);
-	newPeriod.addBoolParameter("State", "current state of this period", false);
-	newPeriod.addEnumParameter("Mode", "over will override shedule value (OFF included), OR will be ON if schedule OR period is on, AND if both are ON ",
-								"OVER", 0, "OR", 1, "AND", 2).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Start Year", "type year of event or -1 to repeat each year", 2024, -1, 2100).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Start Month", "", 1, -1, 12).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Start Day", "", 1, -1, 31).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Start hour", "", 8, -1, 23).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Start minute", "", 0, -1, 59).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Stop Year", "type year of event or -1 to repeat each year", 2024, -1, 2100).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Stop Month", "", 1, -1, 12).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Stop Day", "", 1, -1, 31).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Stop hour", "", 8, -1, 23).setAttribute("saveValueOnly",false);
-	newPeriod.addIntParameter("Stop minute", "", 0, -1, 59).setAttribute("saveValueOnly",false);
-}
+// 	script.log(period_list.length);
+// 	var periodString = "Period " + (period_list.length+1);
+// 	var newPeriod = local.getChild("parameters").getChild("Periods List").addContainer(periodString);
+// 	newPeriod.addBoolParameter("State", "current state of this period", false);
+// 	newPeriod.addEnumParameter("Mode", "over will override shedule value (OFF included), OR will be ON if schedule OR period is on, AND if both are ON ",
+// 								"OVER", 0, "OR", 1, "AND", 2).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Start Year", "type year of event or -1 to repeat each year", 2024, -1, 2100).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Start Month", "", 1, -1, 12).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Start Day", "", 1, -1, 31).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Start hour", "", 8, -1, 23).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Start minute", "", 0, -1, 59).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Stop Year", "type year of event or -1 to repeat each year", 2024, -1, 2100).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Stop Month", "", 1, -1, 12).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Stop Day", "", 1, -1, 31).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Stop hour", "", 8, -1, 23).setAttribute("saveValueOnly",false);
+// 	newPeriod.addIntParameter("Stop minute", "", 0, -1, 59).setAttribute("saveValueOnly",false);
+// }
 
 function clearSchedules(){
 	script.log("Clear all schedules");
@@ -180,15 +169,15 @@ function clearSchedules(){
 	script.refreshEnvironment();
 }
 
-function clearAllPeriods(){
-	script.log("Clear all periods");
-	local.getChild("parameters").removeContainer("Periods List");
-	script.refreshEnvironment();
-	var periodsList = local.getChild("parameters").addContainer("Periods List");
-	// periodsList.addTrigger("Add Period", "");
-	// periodsList.addTrigger("Clear all Priods", "");
-	script.refreshEnvironment();
-}
+// function clearAllPeriods(){
+// 	script.log("Clear all periods");
+// 	local.getChild("parameters").removeContainer("Periods List");
+// 	script.refreshEnvironment();
+// 	var periodsList = local.getChild("parameters").addContainer("Periods List");
+// 	// periodsList.addTrigger("Add Period", "");
+// 	// periodsList.addTrigger("Clear all Priods", "");
+// 	script.refreshEnvironment();
+// }
 
 
 ///////////////////////////		TIME AND STATE		/////////////////////////////
@@ -228,6 +217,7 @@ function updateState(){
 	if(mode=="off"){state = false;}
 	else if(mode=="on"){state = true;}
 	else if(mode=="auto"){
+		script.refreshEnvironment();
 
 		//Get the list of schedules and parse them
 		var schedulesList = local.getChild("parameters").getChild("Schedule List").getContainers();
@@ -236,66 +226,134 @@ function updateState(){
 			for (var i=0; i<schedulesList.length; i++){
 				var scheduleState = false ;
 				script.log(schedulesList[i].name);
-				//first check if the schedule is active today, else pass
+
+				// //first check if the schedule is active today, else pass
+				// script.log(currentTime.weekDayName);				
+				// if(schedulesList[i].getChild("days").getChild(currentTime.weekDayName).get()){
+
+				// 	// check if we are in date range
+				// 	var startDate = schedulesList[i].startDate.get();
+				// 	var split = startDate.split("/"); //{day, month, year}
+				// 	var day = parseInt(split[0]) ;
+				// 	var month = parseInt(split[1]) ;
+				// 	var year = parseInt(split[2]) ;
+				// 	if(year == 0){year = currentTime.year ;}
+				// 	script.log(day + " " + month + " " + year);
+
+				// 	if( (year < currentTime.year) ||
+				// 		((year == currentTime.year) && (month < currentTime.month)) ||
+				// 		((year == currentTime.year) && (month == currentTime.month) && (day <= currentTime.monthDay))
+				// 		){
+				// 			script.log("schedule started ok");
+				// 			//startDate is passed, let's test enDate
+				// 			startDate = schedulesList[i].stopDate.get();
+				// 			split = startDate.split("/"); //{day, month, year}
+				// 			day = parseInt(split[0]) ;
+				// 			month = parseInt(split[1]) ;
+				// 			year = parseInt(split[2]) ;
+				// 			if((year == 0) && (month >= currentTime.month)){year = currentTime.year ;}
+				// 			else if((year == 0) && (month < currentTime.month)){year = currentTime.year + 1 ;}
+				// 			script.log(day + " " + month + " " + year);
+
+				// 			if( (year > currentTime.year) ||
+				// 				((year == currentTime.year) && (month > currentTime.month)) ||
+				// 				((year == currentTime.year) && (month == currentTime.month) && (day >= currentTime.monthDay)) ){
+				// 					script.log("schedule active");
+
+
+				// 					var time = schedulesList[i].startTime.get();
+				// 					split = time.split(":"); //{hour,minutes}
+				// 					time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
+
+				// 					if(time <= currentTime.fullDayTime){
+				// 						script.log("started");
+				// 						time = schedulesList[i].stopTime.get();
+				// 						split = time.split(":"); //{hour,minutes}
+				// 						time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
+				// 						if(time >= currentTime.fullDayTime){
+				// 							script.log(" and running");
+				// 							scheduleState = true ;
+				// 							state = true ;
+				// 						}
+
+				// 					}
+									
+
+									
+									
+
+				// 			}
+				// 	}
+				// }
+
+				// first check if the schedule is active today, else pass
 				script.log(currentTime.weekDayName);				
 				if(schedulesList[i].getChild("days").getChild(currentTime.weekDayName).get()){
+					
+					//parse all timing informations
+					var split ;
+					//startDate
+					split = schedulesList[i].startDate.get().split("/"); //{day, month, year}
+					var startDay = parseInt(parseFloat(split[0])) ;
+					var startMonth = parseInt(parseFloat(split[1])) ;
+					var startYear = parseInt(parseFloat(split[2])) ;
+					//if month is not specified, add current month
+					if(startMonth == 0){startMonth = currentTime.month ;}
+					//if year is not specified, add current year
+					if(startYear == 0){startYear = currentTime.year ;}
+					script.log("Start date : " + startDay + " " + startMonth + " " + startYear);
 
-					// check if we are in date range
-					var startDate = schedulesList[i].startDate.get();
-					var split = startDate.split("/"); //{day, month, year}
-					var day = parseInt(split[0]) ;
-					var month = parseInt(split[1]) ;
-					var year = parseInt(split[2]) ;
-					if(year == 0){year = currentTime.year ;}
-					script.log(day + " " + month + " " + year);
-
-					if( (year < currentTime.year) ||
-						((year == currentTime.year) && (month < currentTime.month)) ||
-						((year == currentTime.year) && (month == currentTime.month) && (day <= currentTime.monthDay))
+					if( (startYear < currentTime.year) ||
+						((startYear == currentTime.year) && (startMonth < currentTime.month)) ||
+						((startYear == currentTime.year) && (startMonth == currentTime.month) && (startDay <= currentTime.monthDay))
 						){
-							script.log("schedule started ok");
-							//startDate is passed, let's test enDate
-							startDate = schedulesList[i].stopDate.get();
-							split = startDate.split("/"); //{day, month, year}
-							day = parseInt(split[0]) ;
-							month = parseInt(split[1]) ;
-							year = parseInt(split[2]) ;
-							if((year == 0) && (month >= currentTime.month)){year = currentTime.year ;}
-							else if((year == 0) && (month < currentTime.month)){year = currentTime.year + 1 ;}
-							script.log(day + " " + month + " " + year);
+							script.log("Start date is passed, testing stop date");
+							//startDate is passed, let's test stopDate
+							split = schedulesList[i].stopDate.get().split("/"); //{day, month, year}
+							var stopDay = parseInt(parseFloat(split[0])) ;
+							var stopMonth = parseInt(parseFloat(split[1])) ;
+							var stopYear = parseInt(parseFloat(split[2])) ;
+							//if month is not specified, add current month, or next month depending on end day vs start day
+							if((stopMonth == 0) && (stopDay >= startDay)){stopMonth = currentTime.month ;}
+							else if((stopMonth == 0) && (stopDay < startDay)){stopMonth = currentTime.month + 1 ; if(stopMonth==13){stopMonth=1;}} //might give 13
+							//if year is not specified, add current year or next year depending on end month vs start month
+							if((stopYear == 0) && (stopMonth >= startMonth)){stopYear = currentTime.year ;}
+							else if((stopYear == 0) && (stopMonth < startMonth)){stopYear = currentTime.year + 1 ;}
+							script.log("Stop date : " + stopDay + " " + stopMonth + " " + stopYear);
 
-							if( (year > currentTime.year) ||
-								((year == currentTime.year) && (month > currentTime.month)) ||
-								((year == currentTime.year) && (month == currentTime.month) && (day >= currentTime.monthDay)) ){
-									script.log("schedule active");
-
-
-									var time = schedulesList[i].startTime.get();
-									split = time.split(":"); //{hour,minutes}
-									time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
-
-									if(time <= currentTime.fullDayTime){
-										script.log("started");
-										time = schedulesList[i].stopTime.get();
-										split = time.split(":"); //{hour,minutes}
-										time = parseInt(split[0]) * 3600 + parseInt(split[1])*60 ;	
-										if(time >= currentTime.fullDayTime){
-											script.log(" and running");
-											scheduleState = true ;
-											state = true ;
-										}
-
+							if( (stopYear > currentTime.year) ||
+								((stopYear == currentTime.year) && (stopMonth > currentTime.month)) ||
+								((stopYear == currentTime.year) && (stopMonth == currentTime.month) && (stopDay >= currentTime.monthDay)) 
+								){
+									script.log("Stop date is not passed, checking hour range");
+									split = schedulesList[i].startTime.get().split(":"); //{hour,minutes}
+									// for(var i=0; i<split.length ; i++){script.log(parseFloat(split[i]));}
+									var startTime = parseFloat(split[0]) * 3600 + parseFloat(split[1])*60 ;	
+									split = schedulesList[i].stopTime.get().split(":"); //{hour,minutes}
+									var stopTime = parseFloat(split[0]) * 3600 + parseFloat(split[1])*60 ;	
+									script.log(startTime + " - " + stopTime );
+									if ((startTime <= stopTime) && (startTime<=currentTime.fullDayTime) && (stopTime>currentTime.fullDayTime)){
+										script.log("running between");
+										scheduleState = true ;
+										state = true ;
 									}
-									
-
-									
-									
-
+									else if ((startTime > stopTime) && ((startTime<=currentTime.fullDayTime) || (stopTime>currentTime.fullDayTime))){
+										script.log("running before or after");
+										scheduleState = true ;
+										state = true ;
+									}
 							}
+							else {script.log("Stop date is passed");}
 					}
+					else{script.log("start date not passed");}
+
+
+				// schedulesList[i].state.set(scheduleState);
 				}
+				else{script.log(script.log(schedulesList[i].name) + "not scheduled today");}
 				schedulesList[i].state.set(scheduleState);
 			}
+
 		}
 	}
 
